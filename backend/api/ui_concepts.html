@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShipSure-AI — UI Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Mono:wght@400;500&family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; color: #fff; font-family: 'Syne', sans-serif; padding: 48px 32px; }
+
+h1 { font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: #555; margin-bottom: 8px; }
+.subtitle { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 64px; }
+
+.concepts { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+
+/* ── CONCEPT LABEL ── */
+.concept-wrap { display: flex; flex-direction: column; gap: 16px; }
+.concept-label { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #555; }
+.concept-name { font-size: 18px; font-weight: 700; color: #fff; }
+.concept-desc { font-size: 13px; color: #666; line-height: 1.6; margin-bottom: 8px; }
+
+/* ══════════════════════════════════════════
+   CONCEPT 1 — COMMAND CENTER (Dark + Neon)
+══════════════════════════════════════════ */
+.c1 {
+  background: #080c14;
+  border: 1px solid #1a2540;
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'DM Mono', monospace;
+  height: 420px;
+  overflow: hidden;
+  position: relative;
+}
+.c1::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #00e5ff44, transparent);
+}
+.c1-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #1a2540;
+}
+.c1-logo { font-size: 11px; letter-spacing: 0.2em; color: #00e5ff; text-transform: uppercase; }
+.c1-status { font-size: 10px; color: #00ff88; display: flex; align-items: center; gap: 6px; }
+.c1-dot { width: 6px; height: 6px; border-radius: 50%; background: #00ff88; box-shadow: 0 0 8px #00ff88; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+.c1-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.c1-stat { background: #0d1525; border: 1px solid #1a2540; border-radius: 6px; padding: 10px; }
+.c1-stat-val { font-size: 20px; font-weight: 500; color: #fff; }
+.c1-stat-label { font-size: 9px; color: #445; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+.c1-stat.high .c1-stat-val { color: #ff4d6d; }
+.c1-stat.med .c1-stat-val { color: #ffd166; }
+.c1-stat.low .c1-stat-val { color: #00ff88; }
+
+.c1-table-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr; gap: 8px; font-size: 9px; color: #334; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 4px; margin-bottom: 6px; }
+.c1-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr; gap: 8px; background: #0d1525; border: 1px solid #1a2540; border-radius: 4px; padding: 8px 10px; margin-bottom: 4px; font-size: 11px; align-items: center; }
+.c1-row:hover { border-color: #00e5ff33; }
+.badge { font-size: 9px; padding: 2px 8px; border-radius: 3px; font-weight: 500; letter-spacing: 0.05em; display: inline-block; }
+.badge-high { background: #ff4d6d22; color: #ff4d6d; border: 1px solid #ff4d6d44; }
+.badge-med  { background: #ffd16622; color: #ffd166; border: 1px solid #ffd16644; }
+.badge-low  { background: #00ff8822; color: #00ff88; border: 1px solid #00ff8844; }
+.score-bar { width: 100%; height: 3px; background: #1a2540; border-radius: 2px; overflow: hidden; }
+.score-fill { height: 100%; border-radius: 2px; }
+.score-fill.h { background: #ff4d6d; width: 91%; }
+.score-fill.m { background: #ffd166; width: 58%; }
+.score-fill.l { background: #00ff88; width: 12%; }
+
+/* ══════════════════════════════════════════
+   CONCEPT 2 — CLEAN SAAS (Light + Sharp)
+══════════════════════════════════════════ */
+.c2 {
+  background: #f8f7f4;
+  border: 1px solid #e5e2dc;
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'Space Grotesk', sans-serif;
+  height: 420px;
+  overflow: hidden;
+  color: #1a1a1a;
+}
+.c2-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.c2-logo { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+.c2-logo span { color: #d4500a; }
+.c2-nav { display: flex; gap: 16px; }
+.c2-nav-item { font-size: 11px; color: #999; cursor: pointer; }
+.c2-nav-item.active { color: #1a1a1a; font-weight: 600; border-bottom: 2px solid #d4500a; padding-bottom: 2px; }
+
+.c2-kpi { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.c2-kpi-card { background: #fff; border: 1px solid #e5e2dc; border-radius: 8px; padding: 12px; }
+.c2-kpi-val { font-size: 22px; font-weight: 600; color: #1a1a1a; }
+.c2-kpi-label { font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 2px; }
+.c2-kpi-card.alert .c2-kpi-val { color: #d4500a; }
+
+.c2-table { background: #fff; border: 1px solid #e5e2dc; border-radius: 8px; overflow: hidden; }
+.c2-thead { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr 1fr; gap: 8px; padding: 8px 14px; background: #f0ede8; font-size: 10px; color: #999; text-transform: uppercase; letter-spacing: 0.08em; }
+.c2-trow { display: grid; grid-template-columns: 2fr 1fr 1fr 1.2fr 1fr; gap: 8px; padding: 10px 14px; font-size: 12px; color: #333; border-top: 1px solid #f0ede8; align-items: center; }
+.c2-badge { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.c2-badge.high { background: #fde8e0; color: #d4500a; }
+.c2-badge.med  { background: #fef3cd; color: #b45309; }
+.c2-badge.low  { background: #e0f5ea; color: #166534; }
+.c2-score { font-size: 13px; font-weight: 600; }
+.c2-score.h { color: #d4500a; }
+.c2-score.m { color: #b45309; }
+.c2-score.l { color: #166534; }
+
+/* ══════════════════════════════════════════
+   CONCEPT 3 — BOLD EDITORIAL (Ink + Accent)
+══════════════════════════════════════════ */
+.c3 {
+  background: #f5f0e8;
+  border: 1px solid #ddd5c5;
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'Syne', sans-serif;
+  height: 420px;
+  overflow: hidden;
+  color: #1a1510;
+  position: relative;
+}
+.c3-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+.c3-logo { font-size: 18px; font-weight: 800; color: #1a1510; letter-spacing: -0.03em; }
+.c3-logo em { font-style: italic; font-family: 'Instrument Serif', serif; color: #c8401a; }
+.c3-tagline { font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: #9a8a75; margin-top: 2px; }
+.c3-live { font-size: 10px; background: #c8401a; color: #fff; padding: 4px 10px; border-radius: 2px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; }
+
+.c3-divider { width: 100%; height: 2px; background: #1a1510; margin-bottom: 14px; }
+
+.c3-stats { display: flex; gap: 0; margin-bottom: 14px; }
+.c3-stat { flex: 1; padding: 10px 14px; border-right: 1px solid #ddd5c5; }
+.c3-stat:last-child { border-right: none; }
+.c3-stat-val { font-size: 28px; font-weight: 800; color: #1a1510; letter-spacing: -0.04em; line-height: 1; }
+.c3-stat-val.danger { color: #c8401a; }
+.c3-stat-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: #9a8a75; margin-top: 4px; }
+
+.c3-orders { display: flex; flex-direction: column; gap: 6px; }
+.c3-order { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #ede8de; border-left: 3px solid transparent; }
+.c3-order.high { border-left-color: #c8401a; }
+.c3-order.med  { border-left-color: #e07b39; }
+.c3-order.low  { border-left-color: #4a8c5c; }
+.c3-order-id { font-size: 10px; font-family: 'DM Mono', monospace; color: #9a8a75; width: 60px; }
+.c3-order-cat { font-size: 12px; font-weight: 700; flex: 1; }
+.c3-order-pay { font-size: 10px; color: #9a8a75; width: 50px; }
+.c3-order-score { font-size: 16px; font-weight: 800; width: 36px; text-align: right; }
+.c3-order-score.h { color: #c8401a; }
+.c3-order-score.m { color: #e07b39; }
+.c3-order-score.l { color: #4a8c5c; }
+.c3-order-label { font-size: 9px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 2px 7px; }
+.c3-order-label.high { background: #c8401a; color: #fff; }
+.c3-order-label.med  { background: #e07b39; color: #fff; }
+.c3-order-label.low  { background: #4a8c5c; color: #fff; }
+
+/* footer */
+.footer { margin-top: 56px; font-size: 11px; color: #444; letter-spacing: 0.05em; }
+.footer span { color: #666; }
+</style>
+</head>
+<body>
+
+<h1>ShipSure-AI</h1>
+<div class="subtitle">Pick your dashboard direction</div>
+
+<div class="concepts">
+
+  <!-- CONCEPT 1 -->
+  <div class="concept-wrap">
+    <div>
+      <div class="concept-label">Concept 01</div>
+      <div class="concept-name">Command Center</div>
+      <div class="concept-desc">Dark, terminal-style, neon accents. Feels like mission control. Serious and technical — impresses in demos.</div>
+    </div>
+    <div class="c1">
+      <div class="c1-header">
+        <div class="c1-logo">ShipSure / Dashboard</div>
+        <div class="c1-status"><div class="c1-dot"></div>Live</div>
+      </div>
+      <div class="c1-stats">
+        <div class="c1-stat">
+          <div class="c1-stat-val">320</div>
+          <div class="c1-stat-label">Orders today</div>
+        </div>
+        <div class="c1-stat high">
+          <div class="c1-stat-val">18</div>
+          <div class="c1-stat-label">High Risk</div>
+        </div>
+        <div class="c1-stat low">
+          <div class="c1-stat-val">₹42k</div>
+          <div class="c1-stat-label">Est. Saved</div>
+        </div>
+      </div>
+      <div class="c1-table-header">
+        <div>Order</div><div>Score</div><div>Risk</div><div>Action</div>
+      </div>
+      <div class="c1-row">
+        <div>#ORD-4821 · Clothing</div>
+        <div>
+          <div style="font-size:13px;color:#ff4d6d">91</div>
+          <div class="score-bar"><div class="score-fill h"></div></div>
+        </div>
+        <div><span class="badge badge-high">HIGH</span></div>
+        <div style="font-size:9px;color:#ff4d6d">Under Review</div>
+      </div>
+      <div class="c1-row">
+        <div>#ORD-4820 · Electronics</div>
+        <div>
+          <div style="font-size:13px;color:#ffd166">58</div>
+          <div class="score-bar"><div class="score-fill m"></div></div>
+        </div>
+        <div><span class="badge badge-med">MED</span></div>
+        <div style="font-size:9px;color:#ffd166">OTP Sent</div>
+      </div>
+      <div class="c1-row">
+        <div>#ORD-4819 · Electronics</div>
+        <div>
+          <div style="font-size:13px;color:#00ff88">12</div>
+          <div class="score-bar"><div class="score-fill l"></div></div>
+        </div>
+        <div><span class="badge badge-low">LOW</span></div>
+        <div style="font-size:9px;color:#00ff88">Processing</div>
+      </div>
+      <div class="c1-row">
+        <div>#ORD-4818 · Jewelry</div>
+        <div>
+          <div style="font-size:13px;color:#00ff88">5</div>
+          <div class="score-bar"><div class="score-fill l" style="width:5%"></div></div>
+        </div>
+        <div><span class="badge badge-low">LOW</span></div>
+        <div style="font-size:9px;color:#00ff88">Processing</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT 2 -->
+  <div class="concept-wrap">
+    <div>
+      <div class="concept-label">Concept 02</div>
+      <div class="concept-name">Clean SaaS</div>
+      <div class="concept-desc">Light, professional, warm whites. Looks like a real product. Easy to use, great for non-technical store owners.</div>
+    </div>
+    <div class="c2">
+      <div class="c2-header">
+        <div class="c2-logo">Ship<span>Sure</span></div>
+        <div class="c2-nav">
+          <div class="c2-nav-item active">Orders</div>
+          <div class="c2-nav-item">Analytics</div>
+          <div class="c2-nav-item">Settings</div>
+        </div>
+      </div>
+      <div class="c2-kpi">
+        <div class="c2-kpi-card alert">
+          <div class="c2-kpi-val">18</div>
+          <div class="c2-kpi-label">High Risk</div>
+        </div>
+        <div class="c2-kpi-card">
+          <div class="c2-kpi-val">42</div>
+          <div class="c2-kpi-label">Medium</div>
+        </div>
+        <div class="c2-kpi-card">
+          <div class="c2-kpi-val">260</div>
+          <div class="c2-kpi-label">Low Risk</div>
+        </div>
+        <div class="c2-kpi-card">
+          <div class="c2-kpi-val">₹42k</div>
+          <div class="c2-kpi-label">Saved</div>
+        </div>
+      </div>
+      <div class="c2-table">
+        <div class="c2-thead">
+          <div>Order ID</div><div>Category</div><div>Payment</div><div>Risk</div><div>Score</div>
+        </div>
+        <div class="c2-trow">
+          <div>#4821</div><div>Clothing</div><div>COD</div>
+          <div><span class="c2-badge high">High</span></div>
+          <div class="c2-score h">91</div>
+        </div>
+        <div class="c2-trow">
+          <div>#4820</div><div>Electronics</div><div>COD</div>
+          <div><span class="c2-badge med">Medium</span></div>
+          <div class="c2-score m">58</div>
+        </div>
+        <div class="c2-trow">
+          <div>#4819</div><div>Electronics</div><div>Prepaid</div>
+          <div><span class="c2-badge low">Low</span></div>
+          <div class="c2-score l">12</div>
+        </div>
+        <div class="c2-trow">
+          <div>#4818</div><div>Jewelry</div><div>Prepaid</div>
+          <div><span class="c2-badge low">Low</span></div>
+          <div class="c2-score l">5</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCEPT 3 -->
+  <div class="concept-wrap">
+    <div>
+      <div class="concept-label">Concept 03</div>
+      <div class="concept-name">Bold Editorial</div>
+      <div class="concept-desc">Warm paper tones, strong typography, terracotta accents. Distinctive and memorable — stands out in a presentation.</div>
+    </div>
+    <div class="c3">
+      <div class="c3-top">
+        <div>
+          <div class="c3-logo">Ship<em>Sure</em></div>
+          <div class="c3-tagline">Return Risk Intelligence</div>
+        </div>
+        <div class="c3-live">● Live</div>
+      </div>
+      <div class="c3-divider"></div>
+      <div class="c3-stats">
+        <div class="c3-stat">
+          <div class="c3-stat-val">320</div>
+          <div class="c3-stat-label">Orders</div>
+        </div>
+        <div class="c3-stat">
+          <div class="c3-stat-val danger">18</div>
+          <div class="c3-stat-label">High Risk</div>
+        </div>
+        <div class="c3-stat">
+          <div class="c3-stat-val">₹42k</div>
+          <div class="c3-stat-label">Saved</div>
+        </div>
+      </div>
+      <div class="c3-orders">
+        <div class="c3-order high">
+          <div class="c3-order-id">#4821</div>
+          <div class="c3-order-cat">Clothing · Women</div>
+          <div class="c3-order-pay">COD</div>
+          <div class="c3-order-score h">91</div>
+          <div class="c3-order-label high">High</div>
+        </div>
+        <div class="c3-order med">
+          <div class="c3-order-id">#4820</div>
+          <div class="c3-order-cat">Electronics · Phones</div>
+          <div class="c3-order-pay">COD</div>
+          <div class="c3-order-score m">58</div>
+          <div class="c3-order-label med">Medium</div>
+        </div>
+        <div class="c3-order low">
+          <div class="c3-order-id">#4819</div>
+          <div class="c3-order-cat">Electronics · Laptops</div>
+          <div class="c3-order-pay">Prepaid</div>
+          <div class="c3-order-score l">12</div>
+          <div class="c3-order-label low">Low</div>
+        </div>
+        <div class="c3-order low">
+          <div class="c3-order-id">#4818</div>
+          <div class="c3-order-cat">Jewelry · Fashion</div>
+          <div class="c3-order-pay">Prepaid</div>
+          <div class="c3-order-score l">5</div>
+          <div class="c3-order-label low">Low</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">All three concepts use the same data and features — only the visual direction differs. <span>Pick one and we build the full dashboard.</span></div>
+
+</body>
+</html>

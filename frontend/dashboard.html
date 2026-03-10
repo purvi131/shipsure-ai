@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShipSure AI — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #060d1c;
+  --surface:  #0a1428;
+  --surface2: #0f1d36;
+  --border:   #1a3568;
+  --teal:     #0fb8a9;
+  --teal-l:   #2dd4bf;
+  --teal-g:   #0a8f83;
+  --red:      #ef4444;
+  --amber:    #f5a623;
+  --text:     #daeaf5;
+  --muted:    #3d6080;
+  --font:     'Syne', sans-serif;
+  --mono:     'DM Mono', monospace;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body { background:var(--bg); color:var(--text); font-family:var(--font); display:flex; }
+
+.sidebar {
+  width:68px; background:var(--surface); border-right:1px solid var(--border);
+  display:flex; flex-direction:column; align-items:center; padding:16px 0 20px; flex-shrink:0;
+}
+.logo-wrap { width:42px; height:42px; margin-bottom:28px; position:relative; }
+.logo-wrap img { width:42px; height:42px; object-fit:contain; filter:drop-shadow(0 0 14px #0fb8a988); border-radius:8px; }
+.logo-fallback { display:none; width:42px; height:42px; background:linear-gradient(135deg,#1a3568,#0fb8a9); border-radius:10px; align-items:center; justify-content:center; font-size:16px; font-weight:800; color:#fff; box-shadow:0 0 14px #0fb8a988; }
+.nav-group { display:flex; flex-direction:column; gap:4px; width:100%; align-items:center; }
+.nav-item { width:44px; height:44px; border-radius:10px; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; color:var(--muted); position:relative; }
+.nav-item:hover { background:var(--surface2); color:var(--text); }
+.nav-item.active { background:#0fb8a918; color:var(--teal-l); }
+.nav-item.active::before { content:''; position:absolute; left:0; top:28%; bottom:28%; width:2px; border-radius:0 2px 2px 0; background:var(--teal-l); box-shadow:0 0 8px #2dd4bf99; }
+.nav-item svg { width:19px; height:19px; stroke-width:1.7; }
+.tip { position:absolute; left:54px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-size:11px; padding:4px 10px; border-radius:6px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .15s; z-index:99; }
+.nav-item:hover .tip { opacity:1; }
+.sidebar-bottom { margin-top:auto; }
+
+.main { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
+.topbar { height:54px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; padding:0 24px; flex-shrink:0; position:relative; }
+.topbar::after { content:''; position:absolute; bottom:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,#0fb8a944,#2dd4bf22,transparent); }
+.page-title { font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); }
+.page-title strong { color:var(--text); font-weight:700; }
+.topbar-right { display:flex; align-items:center; gap:14px; }
+.live-pill { display:flex; align-items:center; gap:6px; background:#0fb8a914; border:1px solid #0fb8a933; border-radius:20px; padding:4px 12px; font-size:10px; color:var(--teal-l); font-family:var(--mono); }
+.live-dot { width:5px; height:5px; border-radius:50%; background:var(--teal-l); box-shadow:0 0 6px var(--teal-l); animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+.store-pill { background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:4px 14px; font-size:11px; color:var(--muted); }
+.store-pill span { color:var(--teal-l); font-weight:600; }
+
+.page { flex:1; overflow-y:auto; padding:22px 24px; display:none; flex-direction:column; gap:18px; }
+.page.active { display:flex; }
+.page::-webkit-scrollbar { width:4px; }
+.page::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+
+/* KPI */
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+.kpi { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; position:relative; overflow:hidden; animation:fadeUp .4s ease both; }
+.kpi:nth-child(1){animation-delay:.05s} .kpi:nth-child(2){animation-delay:.1s} .kpi:nth-child(3){animation-delay:.15s} .kpi:nth-child(4){animation-delay:.2s}
+.kpi::before { content:''; position:absolute; top:0;left:0;right:0;height:1px; }
+.kpi.t::before { background:linear-gradient(90deg,transparent,var(--teal-l),transparent); }
+.kpi.r::before { background:linear-gradient(90deg,transparent,var(--red),transparent); }
+.kpi.a::before { background:linear-gradient(90deg,transparent,var(--amber),transparent); }
+.kpi.g::before { background:linear-gradient(90deg,transparent,var(--teal),transparent); }
+.kpi-icon { font-size:17px; margin-bottom:8px; }
+.kpi-num { font-size:34px; font-weight:800; line-height:1; letter-spacing:-.03em; }
+.kpi.t .kpi-num{color:var(--teal-l)} .kpi.r .kpi-num{color:var(--red)} .kpi.a .kpi-num{color:var(--amber)} .kpi.g .kpi-num{color:var(--teal)}
+.kpi-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; margin-top:5px; }
+.kpi-foot  { font-size:10px; color:var(--muted); margin-top:10px; font-family:var(--mono); border-top:1px solid var(--border); padding-top:8px; }
+
+/* Card */
+.card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; animation:fadeUp .5s ease both; animation-delay:.2s; }
+.card-title { font-size:12px; font-weight:700; margin-bottom:2px; }
+.card-sub   { font-size:10px; color:var(--muted); font-family:var(--mono); margin-bottom:14px; }
+.charts-row { display:grid; grid-template-columns:1.7fr 1fr; gap:14px; }
+
+/* Bar chart */
+.bar-chart { display:flex; align-items:flex-end; gap:5px; height:90px; }
+.bcol { display:flex; flex-direction:column; align-items:center; gap:4px; flex:1; }
+.bwrap { display:flex; gap:2px; align-items:flex-end; height:78px; }
+.b { width:9px; border-radius:3px 3px 0 0; cursor:pointer; transition:opacity .2s; }
+.b:hover { opacity:.75; }
+.blbl { font-size:8px; color:var(--muted); font-family:var(--mono); }
+
+/* Donut */
+.donut-area { display:flex; align-items:center; gap:18px; }
+.donut { position:relative; width:88px; height:88px; flex-shrink:0; }
+.donut svg { transform:rotate(-90deg); }
+.donut-inner { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.donut-pct { font-size:17px; font-weight:800; color:var(--red); }
+.donut-sub  { font-size:8px; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; }
+.legend { display:flex; flex-direction:column; gap:9px; flex:1; }
+.leg { display:flex; align-items:center; gap:8px; font-size:11px; }
+.leg-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+.leg-val { margin-left:auto; font-family:var(--mono); font-size:10px; color:var(--muted); }
+
+/* Table */
+.table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; animation:fadeUp .5s ease both; animation-delay:.3s; }
+.table-top { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid var(--border); gap:12px; flex-wrap:wrap; }
+.table-top-title { font-size:13px; font-weight:700; }
+.filters { display:flex; gap:6px; }
+.fbtn { font-size:10px; padding:4px 12px; border-radius:20px; cursor:pointer; background:var(--surface2); border:1px solid var(--border); color:var(--muted); font-family:var(--font); transition:all .2s; }
+.fbtn.on { background:#0fb8a918; border-color:var(--teal); color:var(--teal-l); }
+.fbtn:hover:not(.on) { color:var(--text); }
+.th,.tr { display:grid; grid-template-columns:.9fr 1.3fr .8fr .7fr .65fr .9fr 1.4fr .6fr; padding:0 20px; align-items:center; }
+.th { background:var(--surface2); border-bottom:1px solid var(--border); font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:.12em; height:34px; }
+.tr { height:46px; border-bottom:1px solid var(--border); font-size:12px; transition:background .15s; }
+.tr:hover { background:var(--surface2); }
+.tr:last-child { border-bottom:none; }
+.oid { font-family:var(--mono); font-size:10px; color:var(--muted); }
+.badge { font-size:9px; font-weight:700; letter-spacing:.07em; padding:3px 9px; border-radius:4px; display:inline-block; text-transform:uppercase; }
+.bh{background:#ef444418;color:var(--red);border:1px solid #ef444433}
+.bm{background:#f5a62318;color:var(--amber);border:1px solid #f5a62333}
+.bl{background:#0fb8a918;color:var(--teal);border:1px solid #0fb8a933}
+.sc { display:flex; align-items:center; gap:7px; }
+.sn { font-family:var(--mono); font-size:13px; font-weight:500; width:26px; }
+.sn.h{color:var(--red)} .sn.m{color:var(--amber)} .sn.l{color:var(--teal)}
+.sb { flex:1; height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+.sf { height:100%; border-radius:2px; }
+.sfh{background:var(--red)} .sfm{background:var(--amber)} .sfl{background:var(--teal)}
+.act { font-size:9px; }
+.act.h{color:var(--red)} .act.m{color:var(--amber)} .act.l{color:var(--teal)}
+.empty { text-align:center; padding:40px 20px; color:var(--muted); font-size:13px; }
+.empty span { display:block; font-size:28px; margin-bottom:8px; }
+
+/* Predict Form */
+.form-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px 24px; animation:fadeUp .4s ease both; }
+.form-card h3 { font-size:14px; font-weight:700; margin-bottom:4px; }
+.form-card p  { font-size:11px; color:var(--muted); margin-bottom:20px; line-height:1.5; }
+.form-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:18px; }
+.field { display:flex; flex-direction:column; gap:5px; }
+.field label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:.1em; }
+.field select,.field input { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-family:var(--mono); font-size:12px; outline:none; transition:border-color .2s; width:100%; }
+.field select:focus,.field input:focus { border-color:var(--teal); }
+.field select option { background:var(--surface2); }
+.form-actions { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+.predict-btn { background:linear-gradient(135deg,var(--teal),var(--teal-g)); color:#fff; border:none; padding:10px 28px; border-radius:8px; font-family:var(--font); font-size:13px; font-weight:700; cursor:pointer; transition:opacity .2s; display:flex; align-items:center; gap:8px; }
+.predict-btn:hover { opacity:.88; }
+.predict-btn:disabled { opacity:.5; cursor:not-allowed; }
+.spin { width:14px; height:14px; border:2px solid #ffffff44; border-top-color:#fff; border-radius:50%; animation:spin .6s linear infinite; display:none; }
+@keyframes spin { to{transform:rotate(360deg)} }
+.error-box { font-size:11px; color:var(--red); font-family:var(--mono); display:none; padding:10px 14px; background:#ef444410; border:1px solid #ef444430; border-radius:8px; }
+.error-box.show { display:block; }
+
+/* Result */
+.result-card { border-radius:12px; padding:20px 24px; display:none; animation:fadeUp .3s ease both; border:1px solid var(--border); }
+.result-card.show { display:flex; align-items:center; gap:24px; }
+.result-card.High   { background:#ef444410; border-color:#ef444440; }
+.result-card.Medium { background:#f5a62310; border-color:#f5a62340; }
+.result-card.Low    { background:#0fb8a910; border-color:#0fb8a940; }
+.result-score { font-size:56px; font-weight:800; line-height:1; letter-spacing:-.04em; }
+.result-card.High   .result-score{color:var(--red)}
+.result-card.Medium .result-score{color:var(--amber)}
+.result-card.Low    .result-score{color:var(--teal)}
+.result-info { flex:1; }
+.result-label { font-size:20px; font-weight:700; margin-bottom:6px; }
+.result-card.High   .result-label{color:var(--red)}
+.result-card.Medium .result-label{color:var(--amber)}
+.result-card.Low    .result-label{color:var(--teal)}
+.result-rec  { font-size:13px; color:var(--text); line-height:1.5; margin-bottom:6px; }
+.result-meta { font-family:var(--mono); font-size:10px; color:var(--muted); }
+
+/* Analytics */
+.analytics-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.full { grid-column:1/-1; }
+.trend-bars { display:flex; align-items:flex-end; gap:3px; height:70px; margin-top:4px; }
+.tbr { flex:1; border-radius:2px 2px 0 0; min-height:3px; }
+.metric-list { display:flex; flex-direction:column; }
+.ml-row { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid var(--border); font-size:12px; }
+.ml-row:last-child { border-bottom:none; }
+.ml-name { width:150px; }
+.ml-bar { flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+.ml-fill { height:100%; border-radius:2px; }
+.ml-val { font-family:var(--mono); font-size:11px; color:var(--muted); width:36px; text-align:right; }
+
+/* Settings */
+.settings-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.sc2 { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; }
+.sc2 h3 { font-size:13px; font-weight:700; margin-bottom:4px; }
+.sc2 p  { font-size:11px; color:var(--muted); margin-bottom:14px; line-height:1.5; }
+.srow { display:flex; align-items:center; justify-content:space-between; padding:11px 0; border-bottom:1px solid var(--border); }
+.srow:last-of-type { border-bottom:none; }
+.slabel { font-size:12px; } .ssub { font-size:10px; color:var(--muted); margin-top:2px; }
+.tog { width:36px; height:20px; border-radius:10px; background:var(--border); position:relative; cursor:pointer; transition:background .2s; flex-shrink:0; }
+.tog.on { background:var(--teal); }
+.tog::after { content:''; position:absolute; width:14px; height:14px; border-radius:50%; background:#fff; top:3px; left:3px; transition:left .2s; }
+.tog.on::after { left:19px; }
+.api-box { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-family:var(--mono); font-size:11px; color:var(--muted); display:flex; align-items:center; justify-content:space-between; margin-top:10px; gap:10px; }
+.api-key-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.copy-btn { font-size:10px; background:var(--surface); border:1px solid var(--border); color:var(--teal-l); padding:4px 10px; border-radius:4px; cursor:pointer; flex-shrink:0; }
+.copy-btn:hover { background:#0fb8a918; }
+.inp { width:70px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:5px 8px; color:var(--text); font-family:var(--mono); font-size:12px; outline:none; text-align:center; }
+.inp:focus { border-color:var(--teal); }
+.save-btn { margin-top:14px; background:linear-gradient(135deg,var(--teal),var(--teal-g)); color:#fff; border:none; padding:9px 20px; border-radius:8px; font-family:var(--font); font-size:12px; font-weight:700; cursor:pointer; }
+.save-btn:hover { opacity:.88; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo-wrap">
+    <img src="logo.jpg" alt="ShipSure AI" onerror="this.style.display='none';document.querySelector('.logo-fallback').style.display='flex'">
+    <div class="logo-fallback">S</div>
+  </div>
+  <div class="nav-group">
+    <div class="nav-item active" onclick="go('dashboard',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="tip">Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="go('predict',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <span class="tip">Predict</span>
+    </div>
+    <div class="nav-item" onclick="go('orders',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      <span class="tip">Orders</span>
+    </div>
+    <div class="nav-item" onclick="go('analytics',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <span class="tip">Analytics</span>
+    </div>
+    <div class="nav-item" onclick="go('settings',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="tip">Settings</span>
+    </div>
+  </div>
+  <div class="sidebar-bottom">
+    <div class="nav-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      <span class="tip">Logout</span>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="page-title"><strong id="ptitle">Dashboard</strong> &nbsp;/&nbsp; ShipSure AI</div>
+    <div class="topbar-right">
+      <div class="live-pill"><div class="live-dot"></div>API Live</div>
+      <div class="store-pill">Store: <span>DemoMart</span></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="kpi-row">
+      <div class="kpi t"><div class="kpi-icon">📦</div><div class="kpi-num" id="k-total">0</div><div class="kpi-label">Orders Screened</div><div class="kpi-foot" id="k-total-s">Session total</div></div>
+      <div class="kpi r"><div class="kpi-icon">🚨</div><div class="kpi-num" id="k-high">0</div><div class="kpi-label">High Risk</div><div class="kpi-foot" id="k-high-s">0% of total</div></div>
+      <div class="kpi a"><div class="kpi-icon">⚠️</div><div class="kpi-num" id="k-med">0</div><div class="kpi-label">Medium Risk</div><div class="kpi-foot" id="k-med-s">0% of total</div></div>
+      <div class="kpi g"><div class="kpi-icon">✅</div><div class="kpi-num" id="k-low">0</div><div class="kpi-label">Low Risk</div><div class="kpi-foot" id="k-low-s">0% of total</div></div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-top">
+        <div class="table-top-title">Live Orders</div>
+        <div class="filters">
+          <div class="fbtn on" onclick="filt('dash-body','all',this)">All</div>
+          <div class="fbtn" onclick="filt('dash-body','High',this)">High</div>
+          <div class="fbtn" onclick="filt('dash-body','Medium',this)">Medium</div>
+          <div class="fbtn" onclick="filt('dash-body','Low',this)">Low</div>
+        </div>
+      </div>
+      <div class="th"><div>Order ID</div><div>Category</div><div>Payment</div><div>Tier</div><div>Qty</div><div>Risk</div><div>Score</div><div>Action</div></div>
+      <div id="dash-body"><div class="empty"><span>📭</span>No orders yet. Go to Predict to screen your first order.</div></div>
+    </div>
+  </div>
+
+  <!-- PREDICT -->
+  <div class="page" id="page-predict">
+    <div class="form-card">
+      <h3>Screen an Order</h3>
+      <p>Fill in the order details and hit Analyse. ShipSure AI calls your trained XGBoost model in real time and returns a risk score.</p>
+      <div class="form-grid">
+        <div class="field"><label>Order Value (₹)</label><input type="number" id="f-val" value="1299" min="1"></div>
+        <div class="field"><label>Category</label>
+          <select id="f-cat" onchange="syncSubcats()">
+            <option>Clothing</option><option>Electronics</option><option>Jewelry</option><option>Home &amp; Kitchen</option>
+          </select>
+        </div>
+        <div class="field"><label>Subcategory</label><select id="f-sub"><option>Men</option><option>Women</option><option>Kids</option></select></div>
+        <div class="field"><label>Payment</label><select id="f-pay"><option value="COD">COD</option><option value="Prepaid">Prepaid</option></select></div>
+        <div class="field"><label>Past Returns</label><input type="number" id="f-ret" value="2" min="0" max="10"></div>
+        <div class="field"><label>Pincode</label><input type="number" id="f-pin" value="847301"></div>
+        <div class="field"><label>Pincode Tier</label>
+          <select id="f-tier">
+            <option value="3">Tier 3 — Town</option>
+            <option value="2">Tier 2 — City</option>
+            <option value="1">Tier 1 — Metro</option>
+          </select>
+        </div>
+        <div class="field"><label>Account Age (days)</label><input type="number" id="f-age" value="18" min="1"></div>
+        <div class="field"><label>Device</label><select id="f-dev"><option value="mobile">Mobile</option><option value="desktop">Desktop</option></select></div>
+        <div class="field"><label>Quantity</label><input type="number" id="f-qty" value="2" min="1" max="20"></div>
+      </div>
+      <div class="form-actions">
+        <button class="predict-btn" id="pbtn" onclick="runPredict()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span id="pbtn-lbl">Analyse Order</span>
+          <div class="spin" id="pspin"></div>
+        </button>
+        <div class="error-box" id="perr"></div>
+      </div>
+    </div>
+    <div class="result-card" id="rcard">
+      <div class="result-score" id="r-score"></div>
+      <div class="result-info">
+        <div class="result-label" id="r-label"></div>
+        <div class="result-rec"  id="r-rec"></div>
+        <div class="result-meta" id="r-meta"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="page" id="page-orders">
+    <div class="table-wrap">
+      <div class="table-top">
+        <div class="table-top-title">All Screened Orders</div>
+        <div class="filters">
+          <div class="fbtn on" onclick="filt('ord-body','all',this)">All</div>
+          <div class="fbtn" onclick="filt('ord-body','High',this)">🔴 High</div>
+          <div class="fbtn" onclick="filt('ord-body','Medium',this)">🟡 Medium</div>
+          <div class="fbtn" onclick="filt('ord-body','Low',this)">🟢 Low</div>
+        </div>
+      </div>
+      <div class="th"><div>Order ID</div><div>Category</div><div>Payment</div><div>Tier</div><div>Qty</div><div>Risk</div><div>Score</div><div>Action</div></div>
+      <div id="ord-body"><div class="empty"><span>📋</span>No orders screened yet.</div></div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS -->
+  <div class="page" id="page-analytics">
+    <div class="kpi-row">
+      <div class="kpi t"><div class="kpi-icon">📊</div><div class="kpi-num">14.2%</div><div class="kpi-label">Avg Return Rate</div><div class="kpi-foot">Industry avg: 14.9%</div></div>
+      <div class="kpi r"><div class="kpi-icon">📦</div><div class="kpi-num">32%</div><div class="kpi-label">COD Return Rate</div><div class="kpi-foot">Clothing COD: ~40%</div></div>
+      <div class="kpi g"><div class="kpi-icon">💳</div><div class="kpi-num">0.8%</div><div class="kpi-label">Prepaid Return Rate</div><div class="kpi-foot">↓ 93% vs COD</div></div>
+      <div class="kpi a"><div class="kpi-icon">🎯</div><div class="kpi-num">94%</div><div class="kpi-label">Model Accuracy</div><div class="kpi-foot">ROC-AUC: 0.97</div></div>
+    </div>
+    <div class="analytics-grid">
+      <div class="card full">
+        <div class="card-title">7-Day Risk Trend</div>
+        <div class="card-sub">High risk orders per day</div>
+        <div class="trend-bars">
+          <div class="tbr" style="background:var(--red);height:45%"></div>
+          <div class="tbr" style="background:var(--red);height:55%"></div>
+          <div class="tbr" style="background:var(--red);height:38%"></div>
+          <div class="tbr" style="background:var(--red);height:70%"></div>
+          <div class="tbr" style="background:var(--red);height:50%"></div>
+          <div class="tbr" style="background:var(--red);height:62%"></div>
+          <div class="tbr" style="background:var(--teal-l);height:58%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--mono);font-size:9px;color:var(--muted)">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Today</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Return Rate by Category</div>
+        <div class="card-sub">From model training data</div>
+        <div class="metric-list">
+          <div class="ml-row"><div class="ml-name">Clothing</div><div class="ml-bar"><div class="ml-fill" style="width:80%;background:var(--red)"></div></div><div class="ml-val">32%</div></div>
+          <div class="ml-row"><div class="ml-name">Home &amp; Kitchen</div><div class="ml-bar"><div class="ml-fill" style="width:20%;background:var(--amber)"></div></div><div class="ml-val">8%</div></div>
+          <div class="ml-row"><div class="ml-name">Electronics</div><div class="ml-bar"><div class="ml-fill" style="width:25%;background:var(--amber)"></div></div><div class="ml-val">10%</div></div>
+          <div class="ml-row"><div class="ml-name">Jewelry</div><div class="ml-bar"><div class="ml-fill" style="width:10%;background:var(--teal)"></div></div><div class="ml-val">4%</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Return Rate by Pincode Tier</div>
+        <div class="card-sub">Tier 3 = towns &amp; villages</div>
+        <div class="metric-list">
+          <div class="ml-row"><div class="ml-name">Tier 1 — Metro</div><div class="ml-bar"><div class="ml-fill" style="width:30%;background:var(--teal)"></div></div><div class="ml-val">11%</div></div>
+          <div class="ml-row"><div class="ml-name">Tier 2 — City</div><div class="ml-bar"><div class="ml-fill" style="width:50%;background:var(--amber)"></div></div><div class="ml-val">18%</div></div>
+          <div class="ml-row"><div class="ml-name">Tier 3 — Town/Village</div><div class="ml-bar"><div class="ml-fill" style="width:85%;background:var(--red)"></div></div><div class="ml-val">31%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="page" id="page-settings">
+    <div class="settings-grid">
+      <div class="sc2">
+        <h3>Risk Thresholds</h3>
+        <p>Define score boundaries for Low / Medium / High classification.</p>
+        <div class="srow"><div><div class="slabel">Low Risk ceiling</div><div class="ssub">Score 0 to this = Low</div></div><input class="inp" type="number" value="40"></div>
+        <div class="srow"><div><div class="slabel">Medium Risk ceiling</div><div class="ssub">Above Low up to this = Medium</div></div><input class="inp" type="number" value="70"></div>
+        <div class="srow" style="border:none"><div><div class="slabel">High Risk</div><div class="ssub">Above Medium ceiling</div></div><span style="font-family:var(--mono);font-size:12px;color:var(--red)">Auto</span></div>
+        <button class="save-btn">Save Thresholds</button>
+      </div>
+      <div class="sc2">
+        <h3>Medium Risk Action</h3>
+        <p>What happens when an order is flagged Medium Risk.</p>
+        <div class="srow"><div><div class="slabel">Send OTP to customer</div><div class="ssub">Verify via SMS before confirming</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="srow"><div><div class="slabel">Show confirmation page</div><div class="ssub">Customer must re-confirm order</div></div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+      <div class="sc2">
+        <h3>High Risk Action</h3>
+        <p>What happens when an order is flagged High Risk.</p>
+        <div class="srow"><div><div class="slabel">Hold for review</div><div class="ssub">Silent hold, your team decides</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="srow"><div><div class="slabel">Notify customer</div><div class="ssub">"Under review, confirm in 2hrs"</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        <div class="srow"><div><div class="slabel">OTP before escalation</div><div class="ssub">One chance to verify</div></div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+      </div>
+      <div class="sc2">
+        <h3>API Integration</h3>
+        <p>Connect your store to ShipSure AI via this endpoint.</p>
+        <div class="srow" style="border:none"><div><div class="slabel">Predict Endpoint</div><div class="ssub">POST · application/json</div></div></div>
+        <div class="api-box">
+          <div class="api-key-text">http://localhost:8000/predict</div>
+          <button class="copy-btn" onclick="navigator.clipboard.writeText('http://localhost:8000/predict');this.textContent='Copied!'">Copy</button>
+        </div>
+        <div style="margin-top:10px">
+          <div class="srow"><div><div class="slabel">Webhook Active</div><div class="ssub">Receive real-time order events</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = 'http://localhost:8000';
+const SUBCATS = {
+  'Clothing':      ['Men','Women','Kids'],
+  'Electronics':   ['Phones','Laptops','Accessories'],
+  'Jewelry':       ['Gold','Silver','Fashion'],
+  'Home & Kitchen':['Appliances','Decor','Utensils']
+};
+
+let orders = [];
+let counter = 4821;
+
+// Navigation
+const TITLES = {dashboard:'Dashboard',predict:'Predict',orders:'Orders',analytics:'Analytics',settings:'Settings'};
+function go(page, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  el.classList.add('active');
+  document.getElementById('ptitle').textContent = TITLES[page];
+}
+
+// Sync subcategories
+function syncSubcats(){
+  const cat = document.getElementById('f-cat').value;
+  const sel = document.getElementById('f-sub');
+  sel.innerHTML = SUBCATS[cat].map(s=>`<option>${s}</option>`).join('');
+}
+
+// Predict
+async function runPredict(){
+  const btn  = document.getElementById('pbtn');
+  const spin = document.getElementById('pspin');
+  const lbl  = document.getElementById('pbtn-lbl');
+  const err  = document.getElementById('perr');
+  const rc   = document.getElementById('rcard');
+
+  const payload = {
+    order_value:                 parseFloat(document.getElementById('f-val').value),
+    category:                    document.getElementById('f-cat').value,
+    subcategory:                 document.getElementById('f-sub').value,
+    payment_type:                document.getElementById('f-pay').value,
+    past_returns:                parseInt(document.getElementById('f-ret').value),
+    pincode:                     parseInt(document.getElementById('f-pin').value),
+    pincode_tier:                parseInt(document.getElementById('f-tier').value),
+    days_since_account_creation: parseInt(document.getElementById('f-age').value),
+    device_type:                 document.getElementById('f-dev').value,
+    order_quantity:              parseInt(document.getElementById('f-qty').value),
+  };
+
+  btn.disabled=true; spin.style.display='block'; lbl.textContent='Analysing...';
+  err.className='error-box'; rc.className='result-card';
+
+  try {
+    const res = await fetch(`${API_URL}/predict`,{
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
+    });
+    if(!res.ok){ const e=await res.json(); throw new Error(e.detail||'API error'); }
+    const data = await res.json();
+    showResult(data, payload);
+    saveOrder(data, payload);
+  } catch(e){
+    err.textContent = e.message.includes('fetch')
+      ? '⚠ Cannot reach API. Make sure FastAPI is running: uvicorn backend.api.main:app --reload'
+      : '⚠ ' + e.message;
+    err.className='error-box show';
+  } finally {
+    btn.disabled=false; spin.style.display='none'; lbl.textContent='Analyse Order';
+  }
+}
+
+function showResult(d, p){
+  const rc = document.getElementById('rcard');
+  rc.className = `result-card show ${d.risk_label}`;
+  document.getElementById('r-score').textContent = d.risk_score;
+  document.getElementById('r-label').textContent = `${d.risk_label} Risk`;
+  document.getElementById('r-rec').textContent   = d.recommendation;
+  document.getElementById('r-meta').textContent  =
+    `Return probability: ${(d.return_probability*100).toFixed(1)}%  ·  ${p.category} · ${p.subcategory} · ${p.payment_type} · Tier ${p.pincode_tier}`;
+}
+
+function saveOrder(d, p){
+  counter++;
+  const o = {
+    id:`#ORD-${counter}`, cat:p.category, sub:p.subcategory,
+    pay:p.payment_type, tier:p.pincode_tier, qty:p.order_quantity,
+    risk:d.risk_label, score:d.risk_score,
+    action: d.recommendation.split('.')[0]
+  };
+  orders.unshift(o);
+  render(orders,'dash-body');
+  render(orders,'ord-body');
+  updateKPIs();
+}
+
+function rc2(r){ return r==='High'?'h':r==='Medium'?'m':'l'; }
+function bc(r) { return r==='High'?'bh':r==='Medium'?'bm':'bl'; }
+
+function render(data, id){
+  const el = document.getElementById(id);
+  if(!data.length){ el.innerHTML='<div class="empty"><span>📭</span>No orders match this filter.</div>'; return; }
+  el.innerHTML = data.map(o=>`
+    <div class="tr" data-risk="${o.risk}">
+      <div class="oid">${o.id}</div>
+      <div>${o.cat} <span style="color:var(--muted);font-size:10px">· ${o.sub}</span></div>
+      <div style="font-family:var(--mono);font-size:11px">${o.pay}</div>
+      <div style="font-family:var(--mono);font-size:11px">T${o.tier}</div>
+      <div style="font-family:var(--mono);font-size:11px">${o.qty}</div>
+      <div><span class="badge ${bc(o.risk)}">${o.risk}</span></div>
+      <div class="sc">
+        <span class="sn ${rc2(o.risk)}">${o.score}</span>
+        <div class="sb"><div class="sf sf${rc2(o.risk)}" style="width:${o.score}%"></div></div>
+      </div>
+      <div class="act ${rc2(o.risk)}">${o.action}</div>
+    </div>`).join('');
+}
+
+function updateKPIs(){
+  const t=orders.length, h=orders.filter(o=>o.risk==='High').length,
+        m=orders.filter(o=>o.risk==='Medium').length, l=orders.filter(o=>o.risk==='Low').length;
+  document.getElementById('k-total').textContent=t;
+  document.getElementById('k-high').textContent=h;
+  document.getElementById('k-med').textContent=m;
+  document.getElementById('k-low').textContent=l;
+  const pct=v=>t?`${((v/t)*100).toFixed(1)}% of total`:'0% of total';
+  document.getElementById('k-high-s').textContent=pct(h);
+  document.getElementById('k-med-s').textContent=pct(m);
+  document.getElementById('k-low-s').textContent=pct(l);
+}
+
+function filt(bodyId, risk, btn){
+  btn.closest('.filters').querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  render(risk==='all'?orders:orders.filter(o=>o.risk===risk), bodyId);
+}
+</script>
+</body>
+</html>
